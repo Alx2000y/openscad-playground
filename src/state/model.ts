@@ -15,13 +15,53 @@ import { export3MF } from "../io/export_3mf.ts";
 import chroma from "chroma-js";
 
 const githubRx = /^https:\/\/github.com\/([^/]+)\/([^/]+)\/blob\/(.+)$/;
-
+let fileHandle: any;
+fileHandle = false;
 export class Model {
   constructor(private fs: FS, public state: State, private setStateCallback?: (state: State) => void, 
     private statePersister?: StatePersister) {
   }
-  
+  FileSystemName(){
+      return fileHandle?fileHandle.name:'';
+  }
+  FileSystemOpened() {
+      return fileHandle!==false;
+  }
+  async FileSystemOpenFile(){
+    [fileHandle] = await window.showOpenFilePicker();
+    if(fileHandle)
+    this.FileSystemOpenFileProcess();
+  }
+  async FileSystemOpenFileProcess(){
+    if(fileHandle){
+    const file = await fileHandle.getFile();
+    const contents = await file.text();
+    this.source = contents;
+    this.processSource();
+    }
+  }
+  async FileSystemSaveFile(){
+    if(fileHandle){
+    // Create a FileSystemWritableFileStream to write to.
+    const writable = await fileHandle.createWritable();
+    // Write the contents of the file to the stream.
+    await writable.write(this.source);
+    // Close the file and write the contents to disk.
+    await writable.close();
+    }
+  }
   init() {
+    if ('launchQueue' in window && 'files' in LaunchParams.prototype) {
+      launchQueue.setConsumer((launchParams) => {
+        // Nothing to do when the queue is empty.
+        if (launchParams.files.length) {
+        for (const file of launchParams.files) {
+          fileHandle = file;
+          this.FileSystemOpenFileProcess();
+        }
+      }        
+      });
+    }
     if (!this.state.output && !this.state.lastCheckerRun && !this.state.previewing && !this.state.checkingSyntax && !this.state.rendering) {
       this.processSource();
     }
