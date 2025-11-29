@@ -139,7 +139,7 @@ export function registerCustomAppHeightCSSProperty() {
 
 // In PWA mode, persist files in LocalStorage instead of the hash fragment.
 export function isInStandaloneMode() {
-  return Boolean(('standalone' in window.navigator) && (window.navigator.standalone));
+  return Boolean((('standalone' in window.navigator) && (window.navigator.standalone))||(window.matchMedia('(display-mode: standalone)').matches));
 }
 
 export function downloadUrl(url: string, filename: string) {
