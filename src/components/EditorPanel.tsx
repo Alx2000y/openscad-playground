@@ -101,6 +101,19 @@ export default function EditorPanel({className, style}: {className?: string, sty
           },
           {
             separator: true
+          },
+          {
+            label: "Open file",
+            icon: 'pi pi-upload',
+            command: () => model.FileSystemOpenFile(),
+            
+
+          },
+          {
+            label: "Save file",
+            icon: 'pi pi-upload',
+            command: () =>  model.FileSystemSaveFile(),
+            
           },  
           {
             // TODO: popup to ask for file name
@@ -145,6 +158,9 @@ export default function EditorPanel({className, style}: {className?: string, sty
         ] as MenuItem[]} popup ref={menu} />
         <Button title="Editor menu" rounded text icon="pi pi-ellipsis-h" onClick={(e) => menu.current && menu.current.toggle(e)} />
         
+        {model.FileSystemOpened()!==false && 
+          <Button title="Save" rounded text icon="pi pi-save" onClick={(e) => model.FileSystemSaveFile()} />}
+
         <FilePicker 
             style={{
               flex: 1,
