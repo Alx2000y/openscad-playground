@@ -90,7 +90,17 @@ export default function FilePicker({className, style}: {className?: string, styl
   const fsItems: TreeNode[] = [];
   for (const {path} of state.params.sources) {
     const parent = getParentDir(path);
+
     if (parent === '/') {
+      if(model.FileSystemOpened()!==false) {
+        fsItems.push({
+          icon: 'pi pi-prime',
+          label: model.FileSystemName(),
+          data: path,
+          key: path,
+          selectable: true,
+        });
+      }else
       fsItems.push({
         icon: 'pi pi-home',
         label: path.split('/').pop(),
@@ -116,7 +126,9 @@ export default function FilePicker({className, style}: {className?: string, styl
             if (typeof key === 'string') {
               if (key.startsWith('https://')) {
                 window.open(key, '_blank')
-              } else {
+              } else if (key == "!"){
+                model.FileSystemOpenFileProcess();
+              }else{
                 model.openFile(key);
               }
             }
